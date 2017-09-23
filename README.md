@@ -30,8 +30,9 @@ ln utils/pre-commit.hook .git/hooks/pre-commit
  php -S localhost:8000
  ```
 
- Afterwords you can run the development-server in another terminal using
+ Afterwards you can run the development-server in another terminal using
  ```bash
+ cd frontend
  npm start
  ```
  
