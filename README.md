@@ -24,11 +24,22 @@ ln utils/pre-commit.hook .git/hooks/pre-commit
 ```
 
  ## Development Commands
- To run a development instance change in the backend-legacy folder and start the backend in one terminal.
+ To run a development instance with the old api backend, change to the backend-legacy folder and start the backend in one terminal.
  ```bash
  cd backend-legacy
  php -S localhost:8000
  ```
+
+To run the in development API, install Slim:
+```bash
+cd api
+composer install
+```
+
+Then run it from the base directory as
+```bash
+php -S localhost:8000 -t api/ api/index.php
+```
 
  Afterwards you can run the development-server in another terminal using
  ```bash

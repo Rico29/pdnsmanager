@@ -1,3 +1,5 @@
+api/vendor
+**/composer.lock
 **/config-user.php
 */nbproject/private
 */node_modules/*
