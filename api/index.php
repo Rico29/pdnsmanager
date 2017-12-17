@@ -3,6 +3,7 @@
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 
 require 'vendor/autoload.php';
+require 'classes/autoload.php';
 
 // Include the configuration
 require_once(__DIR__ . '/../config/config.php');
@@ -25,24 +26,31 @@ $container['db'] = function ($c) {
 };
 
 $app->group('/domain', function () {
-    $this->get('/{domain}', function ($request, $response, $args) {
+    $this->get('/{id}', function ($request, $response, $args) {
         // Get the domain with the exact name
-        $stmt = $this->db->prepare("SELECT id,name,type FROM domains WHERE name=:name LIMIT 1");        
+        $stmt = $this->db->prepare("SELECT id,name,type FROM domains WHERE id=:id LIMIT 1");        
 
-        $stmt->bindValue(':name', $args['domain'], PDO::PARAM_STR);
+        $stmt->bindValue(':id', $args['id'], PDO::PARAM_STR);
         $stmt->execute();
-        $stmt->bindColumn('id', $id, PDO::PARAM_INT);
-        $stmt->bindColumn('name', $name);
-        $stmt->bindColumn('type', $type);
-        $stmt->fetch(PDO::FETCH_BOUND);
+        if ($stmt->rowCount() > 0) {
+            $stmt->bindColumn('id', $id, PDO::PARAM_INT);
+            $stmt->bindColumn('name', $name);
+            $stmt->bindColumn('type', $type);
+            $stmt->fetch(PDO::FETCH_BOUND);
+            
+            $text = [
+                'id'    => $id,
+                'name'  => $name,
+                'type'  => $type,
+            ];
+    
+            $content = generateContent(true, $text);
+            return $response->write($content);
+        } else {
+            $content = generateContent(false);
+            return $response->write($content);
+        }
         
-        $text = [
-            'id'    => $id,
-            'name'  => $name,
-            'type'  => $type,
-        ];
-        $content = generateContent(true, $text);
-        return $response->write($content);
     });
 });
 
@@ -55,11 +63,13 @@ $app->any('/_motivation/{name}', function ($request, $response, $args) {
 });
 
 // json_encode your input and return it
-function generateContent(bool $success, $value) {
+function generateContent(bool $success, $value=null) {
     // Initialize $content and add values
     $content = new \stdClass();
     $content->success   = $success;
-    $content->value     = $value;
+    if ($value) {
+        $content->value     = $value;        
+    }
 
     return json_encode($content); 
 }
